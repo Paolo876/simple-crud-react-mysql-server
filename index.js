@@ -25,6 +25,8 @@ db.sequelize.sync().then(()=> {
     app.listen(process.env.PORT || 3001, ()=> {
         console.log("LISTENING TO PORT 3001")
     })    
+}).catch(err => {
+    console.log(err)
 })
 
 //connect db to local mysql through config/config.json ****
