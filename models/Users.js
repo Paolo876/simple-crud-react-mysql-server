@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        userInformation: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        }
     })
 
     Users.associate = (models) => {

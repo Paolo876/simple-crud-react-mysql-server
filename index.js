@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express(); //initialize express
 const cors = require("cors");
+const ImageKit = require('imagekit');
 require("dotenv").config();
-app.use(express.json())
+app.use(express.json());
 app.use(cors());    //to allow api connection from computer to react project
-
 const db = require("./models"); //import tables from models folder
 
 // routers
@@ -19,6 +19,9 @@ app.use("/auth", usersRouter);
 
 const likesRouter = require("./routes/Likes");
 app.use("/likes", likesRouter);
+
+const imageKitRouter = require("./routes/ImageKit");
+app.use("/imagekit", imageKitRouter);
 
 
 db.sequelize.sync().then(()=> {
@@ -61,5 +64,6 @@ db.sequelize.sync().then(()=> {
  * bcryptjs - hash passwords
  * jwt(jsonwebtoken) - auth authorization
  * dotenv
+ * imagekit
  */
 

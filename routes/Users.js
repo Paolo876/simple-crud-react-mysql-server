@@ -12,12 +12,13 @@ router.post("/", async (req, res) => {
     if(isTaken){
         res.json({error: "Username already taken."})
     }else{
-        bcrypt.hash(password, 10).then( data => {
-            Users.create({
+        bcrypt.hash(password, 10).then( async (data) => {
+            const user = await Users.create({
                 username,
-                password: data
+                password: data,
             })
-            res.json("SIGNUP SUCCESSFUL")
+            const accessToken = sign({ username: user.username, id: user.id }, "O7UWf2eGMQNppvpbhd7fHikgUI52P6uwcqMUV4194aeUW88tgxmSVqKFEVzugdm");
+            res.json({accessToken, username: user.username, id: user.id, userInformation: user.userInformation});
         })
     }
 
@@ -34,8 +35,8 @@ router.post("/login", async (req, res) => {
             if(!match) {
                 res.json({error: "The password you entered is incorrect."});
             } else{
-                const accessToken = sign({ username: user.username, id: user.id }, "O7UWf2eGMQNppvpbhd7fHikgUI52P6uwcqMUV4194aeUW88tgxmSVqKFEVzugdm");
-                res.json({accessToken, username: user.username, id: user.id});
+                const accessToken = sign({ username: user.username, id: user.id, userInformation: JSON.parse(user.userInformation) }, "O7UWf2eGMQNppvpbhd7fHikgUI52P6uwcqMUV4194aeUW88tgxmSVqKFEVzugdm");
+                res.json({accessToken, username: user.username, id: user.id, userInformation: JSON.parse(user.userInformation)});   
             }
         })    
     }
@@ -59,7 +60,21 @@ router.get("/profile/:id", async (req,res) => {
     res.json(user)
 })
 
-// update password info
+// update profile info
+router.put("/updateProfile", validateToken, async (req, res) => {
+    const id = req.user.id;
+    const updates = req.body;
+
+    await Users.update(updates, { where: { id }});
+    const user = await Users.findOne({where: { id }});
+
+    const accessToken = sign({ username: user.username, id: user.id, userInformation: JSON.parse(user.userInformation)}, "O7UWf2eGMQNppvpbhd7fHikgUI52P6uwcqMUV4194aeUW88tgxmSVqKFEVzugdm");
+    res.json({accessToken, username: user.username, id: user.id, userInformation: JSON.parse(user.userInformation)});
+
+})
+
+
+// update password info 
 router.put("/changePassword", validateToken, async (req, res) => {
     const id = req.user.id;
     const { oldPassword, newPassword } = req.body;
@@ -73,7 +88,6 @@ router.put("/changePassword", validateToken, async (req, res) => {
             // update new password
             bcrypt.hash(newPassword, 10).then( (data) => {
                 Users.update({password: data}, { where: { id }})
-
                 res.json("Password updated!")
             })
         }
