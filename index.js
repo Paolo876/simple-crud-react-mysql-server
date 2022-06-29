@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express(); //initialize express
-const cors = require("cors");
+// const cors = require("cors");
 const ImageKit = require('imagekit');
 require("dotenv").config();
 app.use(express.json());
