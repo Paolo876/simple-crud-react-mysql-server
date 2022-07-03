@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
         include: [
             {
             model: Users,
-            attributes: ["username"],
+            attributes: ["username", "userInformation"],
             required: true
         },
         {
@@ -19,6 +19,7 @@ router.get("/", async (req, res) => {
         }
     ]
     });
+
     res.json(postsList)
 });
 
