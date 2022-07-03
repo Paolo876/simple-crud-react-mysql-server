@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             }
+
         },
 
     )
@@ -36,6 +37,5 @@ module.exports = (sequelize, DataTypes) => {
             onDelete: "cascade"
         });
     }
-
     return Posts;
 }
