@@ -10,7 +10,7 @@ router.get("/:postId", async (req, res) => {
         where: {PostId: postId },
         include: [{
             model: Users,
-            attributes: ["username"],
+            attributes: ["username", "userInformation"],
             required: true
         }],
 
