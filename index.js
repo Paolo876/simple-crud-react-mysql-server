@@ -7,30 +7,50 @@ app.use(express.json());
 app.use(cors());    //to allow api connection from computer to react project
 const db = require("./models"); //import tables from models folder
 
+//socket io
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST", "PUT"]
+      },
+});
+app.set("socketio", io);
+  
 // routers
-const postRouter = require("./routes/Posts");
-app.use("/posts", postRouter)
+app.use("/posts", require("./routes/Posts"))
+app.use("/comments", require("./routes/Comments"));
+app.use("/auth", require("./routes/Users"));
+app.use("/user-updates", require("./routes/UserUpdates"));
+app.use("/likes", require("./routes/Likes"));
+app.use("/friends", require("./routes/Friends"));
+app.use("/chat", require("./routes/Chat"));
+app.use("/imagekit", require("./routes/ImageKit"));
 
-const commentsRouter = require("./routes/Comments");
-app.use("/comments", commentsRouter);
+//eventHandlers
+// const postHandlers = require("./events/postHandlers");
+// const onConnection = (socket) => {
+    
+// }
 
-const usersRouter = require("./routes/Users");
-app.use("/auth", usersRouter);
+const userHandlers = require("./events/userHandlers");
+const friendHandlers = require("./events/friendHandlers");
+const chatHandlers = require("./events/chatHandlers");
 
-const likesRouter = require("./routes/Likes");
-app.use("/likes", likesRouter);
-
-const imageKitRouter = require("./routes/ImageKit");
-app.use("/imagekit", imageKitRouter);
+io.of("users").on("connection", async (socket) => userHandlers(io, socket))
+io.of("friends").on("connection", async (socket) => friendHandlers(io, socket))
+io.of("chat").on("connection", async (socket) => chatHandlers(io, socket))
 
 
-db.sequelize.sync().then(()=> {
-    app.listen(process.env.PORT || 3001, ()=> {
-        console.log("LISTENING TO PORT 3001")
-    })    
-}).catch(err => {
-    console.log(err)
-})
+db.sequelize.sync()
+    .then(()=> {
+        httpServer.listen(process.env.PORT || 3001, () => console.log("LISTENING TO PORT 3001"));
+
+    })
+    .catch( err => console.log(err))
+
 
 //connect db to local mysql through config/config.json ****
 

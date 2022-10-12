@@ -3,7 +3,6 @@ const router = express.Router();
 const { Posts, Users, Likes } = require("../models");     //import an instance of the Posts model
 const { validateToken } = require("../middlewares/authMiddleware");
 
-
 // get all posts
 router.get("/", async (req, res) => {
     const postsList = await Posts.findAll({
@@ -34,10 +33,10 @@ router.get("/byId/:id", async (req, res) => {
         },
         include: [{
             model: Users,
-            attributes: ["username"],
+            attributes: ["username", "userInformation"],
             required: true
         }]
-    });         
+    });   
     res.json(post);
 });
 
@@ -47,6 +46,11 @@ router.get("/user/:userId", async (req, res) => {
     const posts = await Posts.findAll({
         where: { UserId },
         include: [
+            {
+            model: Users,
+            attributes: ["username", "userInformation"],
+            required: true
+        },
         {
             model: Likes,    //no required tag, some post may not have any likes
             attributes: ["id", "PostId", "UserId"]

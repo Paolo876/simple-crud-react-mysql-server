@@ -12,6 +12,16 @@ module.exports = (sequelize, DataTypes) => {
         userInformation: {
             type: DataTypes.STRING,
             allowNull: true,
+        },
+        isLoggedIn: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            allowNull: false,
+        },
+        userStatus: {
+            type: DataTypes.STRING,
+            defaultValue: "offline",
+            allowNull: false,
         }
     })
 
@@ -28,6 +38,28 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: "UserId",
             onDelete: "cascade"
         })
+
+        Users.hasMany(models.ChatUsers, {
+            foreignKey: "UserId",
+            onDelete: "cascade"
+        })
+        Users.hasMany(models.ChatMessages, {
+            foreignKey: "UserId",
+            onDelete: "cascade"
+        })
+
+        Users.belongsToMany(models.Users, { 
+            as: 'userFriends',
+            foreignKey: 'UserId',
+            through: "friends"
+        });
+
+        Users.belongsToMany(models.Users, { 
+            as: 'friendsOf',
+            foreignKey: 'FriendId',
+            through: "friends"
+        });
+
     }
     return Users;
 }

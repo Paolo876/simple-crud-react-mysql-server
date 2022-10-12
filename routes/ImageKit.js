@@ -15,6 +15,7 @@ router.get('/', (req, res) => {
     res.send(result);
 });
 
+//delete image
 router.delete("/delete/:id", validateToken, (req,res) => {
     const id = req.params.id;
 

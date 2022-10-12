@@ -15,19 +15,16 @@ router.get("/:postId", async (req, res) => {
         }],
 
     });          
-    
-    //findAll comments where the Column PostId is equal to the id from request
-    // const users = await Users.findAll({
-    //     where: {id : comments.UserId}
-    // })
     res.json(comments);
 });
 
 // post new commment
 router.post("/", validateToken, async (req, res) => {
     const response = await Comments.create(req.body);
+    const {io, socket} = req.app.get("socketio");
+    const postHandlers = require("../events/postHandlers");
+    postHandlers(io, socket).sendComment(req.body)
     res.json(response);
-
 })
 
 // delete comment
