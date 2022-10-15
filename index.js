@@ -11,13 +11,15 @@ const db = require("./models"); //import tables from models folder
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
+const io = new Server(httpServer, 
+    {
     cors: {
         origin: "https://simple-crud-react-mysql.herokuapp.com/",
         // origin: "http://localhost:3000",
         methods: ["GET", "POST", "PUT"]
       },
-});
+}
+);
 app.set("socketio", io);
   
 // routers
