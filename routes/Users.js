@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");   //password hash
 const { sign } = require('jsonwebtoken');
 const { validateToken } = require("../middlewares/authMiddleware");
 const sequelize = require('sequelize');
+const { Op } = require("sequelize");
 
 /**
  * user routes includes : signup, login, authorizeToken, getProfileinfo, search/query
@@ -108,7 +109,7 @@ router.get("/status", validateToken, async (req, res) => {
 router.get("/search/:query", async (req,res) => {
     const query = req.params.query.toLowerCase();
     const users = await Users.findAll({
-        where: { username: sequelize.where(sequelize.fn('LOWER', sequelize.col('username')), 'LIKE', '%' + query + '%')},
+        where: { username: sequelize.where(sequelize.fn('LOWER', sequelize.col('username')), 'LIKE', '%' + query + '%'), userInformation: {[Op.ne]: null}},
         attributes: [ "username", "userInformation", "id", "isLoggedIn", "userStatus" ],
     });
     res.json(users)
