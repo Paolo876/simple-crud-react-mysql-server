@@ -1,10 +1,25 @@
 const express = require('express');
 const app = express(); //initialize express
-const cors = require("cors");
-const ImageKit = require('imagekit');
+// const cors = require("cors");
 require("dotenv").config();
 app.use(express.json());
-app.use(cors());    //to allow api connection from computer to react project
+// app.use(cors());    //to allow api connection from computer to react project
+//cors fix***
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested, Content-Type, Accept Authorization"
+    )
+    if (req.method === "OPTIONS") {
+      res.header(
+        "Access-Control-Allow-Methods",
+        "POST, PUT, PATCH, GET, DELETE"
+      )
+      return res.status(200).json({})
+    }
+    next()
+  })
 const db = require("./models"); //import tables from models folder
 
 //socket io
