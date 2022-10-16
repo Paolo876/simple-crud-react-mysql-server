@@ -12,17 +12,17 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const httpServer = createServer(app);
 const io = new Server(httpServer
-, 
-    {
-    cors: { 
-        origin: "https://simple-crud-react-mysql.netlify.app",
-        // origin: "https://simple-crud-react-mysql.herokuapp.com/",
-        // origin: "http://localhost:3000",
-        methods: ["GET", "POST", "PUT"],
-        credentials: true,
-        
-      },
-}
+// , 
+//     {
+//     cors: { 
+//         origin: "https://simple-crud-react-mysql.netlify.app",
+//         // origin: "https://simple-crud-react-mysql.herokuapp.com/",
+//         // origin: "http://localhost:3000",
+//         methods: ["GET", "POST", "PUT"],
+//         credentials: true,
+
+//       },
+// }
 );
 app.set("socketio", io);
   
