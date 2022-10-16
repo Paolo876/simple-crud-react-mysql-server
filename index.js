@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 app.use(express.json());
 app.use(cors());    //to allow api connection from computer to react project
+
 const db = require("./models"); //import tables from models folder
 
 //socket io

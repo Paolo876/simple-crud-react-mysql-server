@@ -106,10 +106,14 @@ router.get("/status", validateToken, async (req, res) => {
     res.json(user)
 })
 //search/query users
-router.get("/search/:query", async (req,res) => {
+router.get("/search/:query", validateToken, async (req,res) => {
     const query = req.params.query.toLowerCase();
     const users = await Users.findAll({
-        where: { username: sequelize.where(sequelize.fn('LOWER', sequelize.col('username')), 'LIKE', '%' + query + '%'), userInformation: {[Op.ne]: null}},
+        where: { 
+            username: sequelize.where(sequelize.fn('LOWER', sequelize.col('username')), 'LIKE', '%' + query + '%'), 
+            userInformation: {[Op.ne]: null},
+            id: {[Op.ne]: req.user.id},
+        },
         attributes: [ "username", "userInformation", "id", "isLoggedIn", "userStatus" ],
     });
     res.json(users)
