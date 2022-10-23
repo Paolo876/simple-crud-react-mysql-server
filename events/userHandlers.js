@@ -3,7 +3,6 @@ const { Users } = require("../models");
 const userHandlers = (io, socket) => {
   let user;
   let userFriends;
-  
   //listen to user connecting.
   socket.on("onConnect", async (id) => {
     user = {id, sockets: [socket.id]};  
@@ -15,7 +14,6 @@ const userHandlers = (io, socket) => {
     } else {
         io.adapter.connectedUsers.push(user)
     }
-
     //get user's friends from db
     let userData = await Users.findOne({where: { id },
       attributes: ["userStatus"],
