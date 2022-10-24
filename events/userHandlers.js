@@ -33,7 +33,6 @@ const userHandlers = (io, socket) => {
         if(userFriends.includes(item.id)) return true;
         return false;
       })
-
       //emit onLogin event to friend's sockets
       connectedFriends.forEach(item => {
         item.sockets.forEach(_item => {
@@ -50,7 +49,9 @@ const userHandlers = (io, socket) => {
   //heartbeat is called on interval to check for friends sudden disconnect
   socket.on("heartbeat", () => {
     // emit id of active friends --as array
-      socket.emit('heartbeat', userFriends && io.adapter.connectedUsers && io.adapter.connectedUsers.filter(item => userFriends.includes(item.id)).map(item => item.id));
+    if(userFriends && io.adapter.connectedUsers){
+      socket.emit('heartbeat', io.adapter.connectedUsers.filter(item => userFriends.includes(item.id)).map(item => item.id));
+    }
   })
 
 
@@ -58,15 +59,18 @@ const userHandlers = (io, socket) => {
     if(io.adapter.connectedUsers && user){
       let item = io.adapter.connectedUsers.find(item => item.id === user.id)
       item.sockets && item.sockets.splice(item.sockets.indexOf(socket.id), 1);      //double check this
+      //if user has no sockets connected, update Users db
       if(item.sockets && item.sockets.length === 0) {
         io.adapter.connectedUsers.splice(io.adapter.connectedUsers.indexOf(item), 1);
         await Users.update({isLoggedIn: false}, { where: { id: user.id } });
+        //emit to friend's sockets
+        io.adapter.connectedUsers.filter(item => userFriends.includes(item.id)).forEach(item => {
+          item.sockets.forEach(_item => io.of("users").to(_item).emit("friend_logout", user.id))
+        })
+        user = null;
+        userFriends = null;
       };
-    }
-
-    //emit only to friends sockets ****
-    // socket.broadcast.emit('heartbeat', socket.adapter.connectedUsers && socket.adapter.connectedUsers.filter(item => userFriends.includes(item.id)).map(item => item.id));
-
+    }   
   })
 
 

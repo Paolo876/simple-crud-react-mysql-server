@@ -77,7 +77,7 @@ const chatHandlers = (io, socket) => {
             chat: {...chatRoom.ChatMessages[0].toJSON()}
         };
         const connectedMembers = io.adapter.connectedUsers.filter(item => result.members.map(_item => _item.id).includes(item.id))
-        connectedMembers.forEach(item => item.sockets.forEach(_item => io.of("users").to(_item).emit("chat-list-new-room", result)))
+        if(connectedMembers) connectedMembers.forEach(item => item.sockets.forEach(_item => io.of("users").to(_item).emit("chat-list-new-room", result)))
     })
     //listen to messages sent
     socket.on("send-message", async (data) => {
