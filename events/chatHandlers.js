@@ -37,7 +37,7 @@ const chatHandlers = (io, socket) => {
             if (existingRoom.users.length === 0) activeRooms.splice(activeRooms.indexOf(existingRoom), 1)
         }
         currentRoom = null;
-        currentUser = null; //null just in case the user logout, to delete the value.
+        currentUser = null; //null just in case the user logout.
     })
 
     //on socket disconnect
@@ -48,6 +48,8 @@ const chatHandlers = (io, socket) => {
             if (existingRoom.users.length === 0) activeRooms.splice(activeRooms.indexOf(existingRoom), 1)
             socket.leave(currentRoom)  //leave room
         }
+        currentRoom = null;
+        currentUser = null;
     })
 
     //listen to new chat room created
@@ -88,12 +90,15 @@ const chatHandlers = (io, socket) => {
         const chatUsers = await ChatUsers.findAll({where: {ChatRoomId:data.ChatRoomId}, attributes: ["UserId"]})
         const chatUsersArr = chatUsers.map(item => item.UserId) 
         const connectedMembers = io.adapter.connectedUsers.filter(item => chatUsersArr.includes(item.id))
-
-        //update isLastMessageRead to true for connected members
-        await ChatUsers.update({isLastMessageRead: true}, {where: {ChatRoomId: data.ChatRoomId, UserId: connectedMembers.map(item => item.id)}})
-
         //if user is in connectedUsers, emit to user's sockets 
         connectedMembers.forEach(item => item.sockets.forEach(_item => io.of("users").to(_item).emit("chat-list-new-message", data)))
+
+        //update isLastMessageRead to true for members in the same chat room
+        const connectedChatRoomMembers = activeRooms.find(item => parseInt(item.room) === parseInt(currentRoom)).users
+        await ChatUsers.update(
+            {isLastMessageRead: true}, 
+            {where: {ChatRoomId: data.ChatRoomId, UserId: connectedMembers.map(item => item.id).filter(_item => connectedChatRoomMembers.includes(_item))}}
+        )
     })
 }
 module.exports = chatHandlers;

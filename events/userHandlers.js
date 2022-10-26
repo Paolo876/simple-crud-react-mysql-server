@@ -101,7 +101,6 @@ const userHandlers = (io, socket) => {
       };
     }
   });
-  
 }
   
 module.exports = userHandlers;
