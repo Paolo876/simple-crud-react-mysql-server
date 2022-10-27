@@ -38,10 +38,10 @@ router.post("/add", validateToken, async (req, res) => {
     const FriendId = req.body.id;
     const UserId = req.user.id;
     const existingRequest = await Friends.findOne({ where: {UserId, FriendId}})
-
     if(action === "add"){
         if(!existingRequest){
             const response = await Friends.create({UserId, FriendId, status: 'pending'});
+            await Friends.create({UserId:FriendId, FriendId:UserId, status: 'awaiting-response'});
             res.json({UserId, FriendId, id: response.id, action})
         } else {
             res.json({error: "Friend request already sent."})
@@ -49,6 +49,7 @@ router.post("/add", validateToken, async (req, res) => {
     }
     if(action === "cancel"){
         await Friends.destroy({ where: {UserId, FriendId}});
+        await Friends.destroy({ where: {UserId:FriendId, FriendId:UserId}});
         res.json({UserId, FriendId, action})
     }
 
@@ -62,15 +63,18 @@ router.post("/request-action", validateToken, async (req, res) => {
     if(action === "confirm"){
         //check if the friendId sent a friend request
         const existingRequest = await Friends.findOne({ where: {UserId, FriendId}});
-        if(existingRequest) await Friends.update({status: "friends"}, { where: {UserId, FriendId}});
-        
+        if(existingRequest) {
+            await Friends.update({status: "friends"}, { where: {UserId, FriendId}});
+            await Friends.update({status: "friends"}, { where: {UserId: FriendId, FriendId: UserId}});
+        }
         // update pending status of friend request
-        await Friends.update({status: "friends"}, { where: {UserId: FriendId, FriendId: UserId}});
-        await Friends.create({UserId, FriendId, status: "friends"});
+        // await Friends.update({status: "friends"}, { where: {UserId: FriendId, FriendId: UserId}});
+        // await Friends.create({UserId, FriendId, status: "friends"});
     }
     if(action === "delete") {
         //delete friend request
-        await Friends.destroy({ where: {UserId: FriendId, FriendId: UserId,}});
+        await Friends.destroy({ where: {UserId: FriendId, FriendId: UserId}});
+        await Friends.destroy({ where: {UserId, FriendId}});
     }
     res.json({FriendId, action})
 })
