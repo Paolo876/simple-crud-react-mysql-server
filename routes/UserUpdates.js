@@ -41,15 +41,4 @@ router.put("/updateProfile", validateToken, async (req, res) => {
     res.json({accessToken, ...responseData });   
 })
 
-
-//change user status
-router.put("/user-status", validateToken, async (req, res) => {
-    const id = req.user.id;
-    await Users.update(req.body, { where: { id } });
-    const accessToken = sign({...req.user, ...req.body}, "O7UWf2eGMQNppvpbhd7fHikgUI52P6uwcqMUV4194aeUW88tgxmSVqKFEVzugdm");
-    const io = req.app.get('socketio');
-    io.of("/users").emit("onLogin", {id: req.user.id, ...req.body }) // <-- emit user id when logged in
-
-    res.json({accessToken, ...req.user, ...req.body });   
-})
 module.exports = router;

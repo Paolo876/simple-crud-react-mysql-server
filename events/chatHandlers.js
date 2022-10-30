@@ -4,7 +4,6 @@ const chatHandlers = (io, socket) => {
     let currentRoom = null;     // current room id of user
     let currentUser = null;     // user id
     let activeRooms;     //[{room: 1, users: [1,2]}]
-
     if(socket.adapter.activeRooms) {
         activeRooms = socket.adapter.activeRooms
     } else {
@@ -81,6 +80,8 @@ const chatHandlers = (io, socket) => {
         const connectedMembers = io.adapter.connectedUsers.filter(item => result.members.map(_item => _item.id).includes(item.id))
         if(connectedMembers) connectedMembers.forEach(item => item.sockets.forEach(_item => io.of("users").to(_item).emit("chat-list-new-room", result)))
     })
+
+
     //listen to messages sent
     socket.on("send-message", async (data) => {
         //emit message to everyone in the same chat room
@@ -100,5 +101,7 @@ const chatHandlers = (io, socket) => {
             {where: {ChatRoomId: data.ChatRoomId, UserId: connectedMembers.map(item => item.id).filter(_item => connectedChatRoomMembers.includes(_item))}}
         )
     })
+
+
 }
 module.exports = chatHandlers;
