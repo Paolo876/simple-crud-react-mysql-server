@@ -39,6 +39,7 @@ const userHandlers = (io, socket) => {
 
   //statusChange listens to user status changes
   socket.on("statusChange", async (data) => {
+    if(!io.adapter.connectedUsers) io.adapter.connectedUsers = [];  
     connectedFriends = io.adapter.connectedUsers.filter(item => userFriends.includes(item.id));   //update connectedFriends array
     const items = [...connectedFriends, io.adapter.connectedUsers.find(item => item.id === user.id)];   //include user's current sockets on emit
     await Users.update({ userStatus: data.userStatus }, { where: { id: data.id } });
@@ -48,6 +49,7 @@ const userHandlers = (io, socket) => {
 
   //heartbeat is called on interval to check for friends sudden disconnect
   socket.on("heartbeat", () => {
+    if(!io.adapter.connectedUsers) io.adapter.connectedUsers = [];  
     connectedFriends = io.adapter.connectedUsers.filter(item => userFriends.includes(item.id));   //update connectedFriends array
     socket.emit('heartbeat', connectedFriends.map(item => item.id));  //emit only the id's of connected friends
   })
