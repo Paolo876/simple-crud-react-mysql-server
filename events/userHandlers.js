@@ -56,21 +56,18 @@ const userHandlers = (io, socket) => {
 
   socket.on("onLogout", async () => {
     if(io.adapter.connectedUsers && user){
-      let item = io.adapter.connectedUsers.find(_item => _item.id === user.id)
-      if(item.sockets) item.sockets = [...item.sockets.filter(_item => _item !== socket.id)];
-      //if user has no sockets connected, update Users db
-      if(item.sockets && item.sockets.length === 0) {
-        io.adapter.connectedUsers = [ ...io.adapter.connectedUsers.filter(_item => _item !== item)]   //remove user from io connectedUsers
-        await Users.update({isLoggedIn: false}, { where: { id: user.id } });    //update isLoggedIn property from db to false
-
-        //emit to friend's sockets
-        // io.adapter.connectedUsers.filter((_item) => userFriends.includes(_item.id)).forEach(__item => {
-        //   __item.sockets.forEach(____item => io.of("users").to(____item).emit("friend_logout", user.id))
-        // })
-        connectedFriends.forEach(__item => {
-            __item.sockets.forEach(____item => io.of("users").to(____item).emit("friend_logout", user.id))
-          })
-      };
+      let item = io.adapter.connectedUsers.find(_item => _item.id === user.id);
+      if(item){
+        if(item.sockets) item.sockets = [...item.sockets.filter(_item => _item !== socket.id)];
+        //if user has no sockets connected, update Users db
+        if(item.sockets && item.sockets.length === 0) {
+          io.adapter.connectedUsers = [ ...io.adapter.connectedUsers.filter(_item => _item !== item)]   //remove user from io connectedUsers
+          await Users.update({isLoggedIn: false}, { where: { id: user.id } });    //update isLoggedIn property from db to false
+          connectedFriends.forEach(__item => {
+              __item.sockets.forEach(____item => io.of("users").to(____item).emit("friend_logout", user.id))
+            })
+        };
+      }
     }  
     user = null;
     userFriends = []; 
