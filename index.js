@@ -49,6 +49,12 @@ db.sequelize.sync()
 
 //connect db to local mysql through config/config.json ****
 
+/**
+ * git add .
+ * git commit -m ""
+ * git push heroku master
+ */
+
 
 
 

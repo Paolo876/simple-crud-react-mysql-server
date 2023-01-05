@@ -116,13 +116,17 @@ router.get("/user-chatrooms", validateToken, async (req,res) => {
         limit : 20  //limit list to 20 (for eager-loading)
     });
     //filter by most recent message
-    const chatRooms = result.map(item => ({ 
+    if(result){
+        const chatRooms = result.map(item => ({ 
             chatRoomId: item.ChatRoomId, 
             members: item.ChatRoom.members.map(_item => { return { id:_item.id, userInformation: _item.userInformation, username:_item.username, isLastMessageRead:_item.ChatUsers.isLastMessageRead}}),
             chat: {...item.ChatRoom.ChatMessages[0].toJSON()}
-        }
-    ));
-    res.json(chatRooms);
+        }));
+        res.json(chatRooms);
+    } else {
+        res.json([]);
+    }
+
 })
 
 module.exports = router;
