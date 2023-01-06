@@ -8,17 +8,17 @@
     "logging": false
   },
   "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
+    "username": "freedb_paolo",
+    "password": "6awae4!3k4&9A!2",
+    "database": "freedb_moby-paolo-bugarin",
+    "host": "sql.freedb.tech",
     "dialect": "mysql"
   },
   "production": {
-    "username": "b4efec3ec66019",
-    "password": "1e67d7ca",
-    "database": "heroku_a364459e6c2cf42",
-    "host": "us-cdbr-east-05.cleardb.net",
+    "username": "freedb_paolo",
+    "password": "6awae4!3k4&9A!2",
+    "database": "freedb_moby-paolo-bugarin",
+    "host": "sql.freedb.tech",
     "dialect": "mysql"
   }
 }
